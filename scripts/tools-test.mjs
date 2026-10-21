@@ -2,7 +2,7 @@ import { chromium } from 'playwright';
 import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
 
-const BASE = process.env.BASE_URL ?? 'http://localhost:4173/File-Organizer-Web/';
+const BASE = process.env.BASE_URL ?? 'http://localhost:4173/';
 const tmp = 'artifacts/tools-test';
 await mkdir(tmp, { recursive: true });
 

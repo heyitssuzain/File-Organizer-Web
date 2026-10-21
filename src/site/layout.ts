@@ -171,13 +171,22 @@ export function mountChrome(): void {
   const themeBtn = document.getElementById('themeBtn') as HTMLButtonElement;
   const applyTheme = (t: string) => {
     document.documentElement.dataset.theme = t;
-    localStorage.setItem(THEMES_KEY, t);
+    try {
+      localStorage.setItem(THEMES_KEY, t);
+    } catch {
+      /* storage can be blocked (private mode / hardened settings) — theme still applies */
+    }
     themeBtn.innerHTML = t === 'dark' ? icon('sun') : icon('moon');
   };
   themeBtn.addEventListener('click', () => {
     applyTheme(document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark');
   });
-  const saved = localStorage.getItem(THEMES_KEY);
+  let saved: string | null = null;
+  try {
+    saved = localStorage.getItem(THEMES_KEY);
+  } catch {
+    /* ignore unavailable storage */
+  }
   if (saved) applyTheme(saved);
 
   // Reveal-on-scroll

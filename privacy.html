@@ -11,6 +11,15 @@
   <meta property="og:description" content="Local processing, no uploads, no accounts, and no first-party tracking. Read the full privacy and cookie details." />
   <meta property="og:url" content="__BASE_URL__/privacy.html" />
   <meta property="og:image" content="__BASE_URL__/og-cover.png" />
+  <meta property="og:site_name" content="AuraFlow Web" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="AuraFlow Web — private file organizer, converter and PDF toolkit" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="AuraFlow Privacy — Your Files Stay on Your Device" />
+  <meta name="twitter:description" content="Local processing, no uploads, no accounts, and no first-party tracking. Read the full privacy and cookie details." />
+  <meta name="twitter:image" content="__BASE_URL__/og-cover.png" />
   <meta name="theme-color" content="#0d0e12" />
   <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
   <script type="application/ld+json">
@@ -62,9 +71,9 @@
       </section>
 
       <section class="card" style="margin-bottom: var(--s-4)">
-        <h2 class="card-title">3. No hidden analytics or telemetry</h2>
-        <p class="text-muted">Today this site has no first-party analytics, no tracking cookies, no fingerprinting, and no third-party requests beyond its own assets. Your preference for light/dark theme is stored in your browser's localStorage — on your device, never transmitted by AuraFlow.</p>
-        <p class="text-muted" style="margin-top: var(--s-3)">If advertising is enabled later, the advertising section below explains what changes. AuraFlow will not add silent tracking.</p>
+        <h2 class="card-title">3. No analytics, telemetry or tracking cookies</h2>
+        <p class="text-muted">Today this site has no first-party analytics, no advertising scripts, no session-replay or fingerprinting code, and no tracking cookies. The only network requests are for the page itself and its own assets (JavaScript, CSS, favicon, the Open Graph image, and the bundled PDF font when you create a text PDF). Those requests go to this site's host, Vercel; they do not contain your selected files, filenames, folder paths or conversion results.</p>
+        <p class="text-muted" style="margin-top: var(--s-3)">Your preference for light or dark theme is stored in your browser's localStorage — on your device, and never transmitted by AuraFlow. If advertising is enabled later, section 9 explains exactly what changes and which choices you will have. AuraFlow will not add silent tracking.</p>
       </section>
 
       <section class="card" style="margin-bottom: var(--s-4)">
@@ -73,12 +82,12 @@
           <strong>Stored locally,</strong> only in your own browser:
         </p>
         <ul class="text-muted text-sm" style="padding-left: 1.1rem; margin-bottom: var(--s-3)">
-          <li>Your light/dark theme choice (localStorage)</li>
+          <li>Your light/dark theme choice (one localStorage key, <code>auraflow-theme</code>)</li>
           <li>Files and PDFs you download (they go to your Downloads folder — you control them)</li>
         </ul>
         <p class="text-muted"><strong>Not stored anywhere:</strong> selected file lists, conversion queues, image previews, page counts, merged documents, duplicate hash results, executed run manifests or conversion history. These live only in the tab's memory. Preview images use temporary <code>blob:</code> URLs that are revoked when you remove an item or leave the page. Close the tab and the in-memory copies are released.
         </p>
-        <p class="text-muted" style="margin-top: var(--s-3)">AuraFlow does not write file contents, filenames or metadata to localStorage, sessionStorage, IndexedDB or cookies. There is no service worker and no persistent file cache.</p>
+        <p class="text-muted" style="margin-top: var(--s-3)">AuraFlow does not write file contents, filenames or metadata to localStorage, sessionStorage, IndexedDB or cookies. There is no service worker, no offline file cache, and no server-side database of your activity. AuraFlow itself sets no cookies. The hosting provider may process request metadata as described in section 8.</p>
       </section>
 
       <section class="card" style="margin-bottom: var(--s-4)">
@@ -100,20 +109,44 @@
 
       <section class="card" style="margin-bottom: var(--s-4)">
         <h2 class="card-title">8. Hosted pages (this website itself)</h2>
-        <p class="text-muted">The site is served as static files by Vercel. Standard web server logs (IP address, dates, requested paths, user agent) are handled by Vercel under its privacy policy and are not available to AuraFlow beyond the aggregate information Vercel provides. AuraFlow does not add its own server-side logging. Files are processed in the tab, so file names, contents and conversion results never appear in a URL, query string or request body.</p>
+        <p class="text-muted">The site is served as static files by Vercel. Like any web host, Vercel processes standard request metadata (such as IP address, date and time, requested URL, user agent and basic device/network information) to deliver the site, keep it available and protect it from abuse. Vercel may retain that metadata according to its own policies; AuraFlow does not receive your file contents or a per-visitor file history, and does not add its own server-side logging.</p>
+        <p class="text-muted" style="margin-top: var(--s-3)">Files are processed in the tab, so file names, contents and conversion results never appear in a URL, query string or request body. Vercel operates infrastructure in multiple regions; request metadata may be processed outside your country. See Vercel's privacy documentation for its retention periods, subprocessors and transfer safeguards.</p>
         <p class="text-sm text-muted">Hosting privacy: <a target="_blank" rel="noopener noreferrer" href="https://vercel.com/legal/privacy-policy">Vercel Privacy Policy</a>.</p>
       </section>
 
-      <section class="card" style="margin-bottom: var(--s-6)">
+      <section class="card" style="margin-bottom: var(--s-4)">
         <h2 class="card-title">9. Advertising and cookies (when enabled)</h2>
-        <p class="text-muted">AuraFlow may display advertising to support the free service. If Google AdSense or another advertising partner is enabled, those third parties may place and read cookies on your browser, or use web beacons, IP addresses, and other identifiers to serve and measure ads. This is separate from your file data: AuraFlow never sends your selected files, filenames, hashes, or folder contents to an ad network.</p>
-        <p class="text-muted" style="margin-top: var(--s-3)">Where required (including the EEA, UK, and Switzerland), advertising will use a consent management platform and will not serve personalized ads without your consent. You can learn how Google uses data from partner sites at <a target="_blank" rel="noopener noreferrer" href="https://www.google.com/policies/privacy/partners/">How Google uses data</a>, and manage ad personalization in <a target="_blank" rel="noopener noreferrer" href="https://adssettings.google.com/">Google Ad Settings</a>.</p>
-        <p class="text-muted" style="margin-top: var(--s-3)">If ads are not enabled, this section is a disclosure of what would apply when they are. The current site loads no advertising scripts.</p>
+        <p class="text-muted">AuraFlow may display advertising to support the free service. <strong>Advertising is not enabled on the current site.</strong> If Google AdSense or another advertising partner is enabled in the future, this policy and the site's consent flow will be updated before any ad script loads.</p>
+        <p class="text-muted" style="margin-top: var(--s-3)">When advertising is enabled, third-party vendors — including Google — may use cookies or similar technologies to serve ads based on a user's prior visits to this website or other websites. Google's use of advertising cookies enables it and its partners to serve ads to users based on their visit to this site and/or other sites on the Internet. These cookies do not give advertisers access to the files you process here, and AuraFlow will never send your selected files, filenames, hashes or folder contents to an ad network.</p>
+        <p class="text-muted" style="margin-top: var(--s-3)">You will be able to opt out of personalized advertising by visiting <a target="_blank" rel="noopener noreferrer" href="https://adssettings.google.com/">Google Ad Settings</a>, and learn how Google uses data from partner sites at <a target="_blank" rel="noopener noreferrer" href="https://www.google.com/policies/privacy/partners/">How Google uses data</a>. You can also visit <a target="_blank" rel="noopener noreferrer" href="https://www.aboutads.info/choices/">aboutads.info</a> to opt out of some third-party vendors' use of cookies for personalized advertising.</p>
+        <p class="text-muted" style="margin-top: var(--s-3)">Where required — including the EEA, the UK and Switzerland — advertising will use a consent management platform and will not serve personalized ads, or set non-essential advertising cookies, without your consent. You will be able to change or withdraw that choice at any time. For visitors in California and other regions with similar laws, AuraFlow does not sell personal information and does not share file data with advertisers.</p>
+        <p class="text-sm text-muted" style="margin-top: var(--s-3)">If ads are not enabled, this section describes what would apply when they are. The current site loads no advertising scripts and sets no advertising cookies.</p>
+      </section>
+
+      <section class="card" style="margin-bottom: var(--s-4)">
+        <h2 class="card-title">10. Your privacy rights</h2>
+        <p class="text-muted">Depending on where you live, you may have the right to request access to, correction of, or deletion of personal information, to object to or restrict certain processing, or to lodge a complaint with a data protection authority. AuraFlow does not maintain user accounts or a database of your files, so in most cases there is no stored file record to access or delete.</p>
+        <p class="text-muted" style="margin-top: var(--s-3)">For questions or requests about this site, email <a href="mailto:thisissaddu3@gmail.com?subject=Privacy%20request">thisissaddu3@gmail.com</a> with “Privacy request” in the subject. Requests about hosting logs may need to be directed to Vercel, because AuraFlow does not control those logs. We will respond on a best-effort basis and within any period required by applicable law.</p>
+      </section>
+
+      <section class="card" style="margin-bottom: var(--s-4)">
+        <h2 class="card-title">11. Children's privacy</h2>
+        <p class="text-muted">AuraFlow is a general-purpose file utility, not a service directed to children. It has no accounts, profiles, chat or user-generated public content, and it does not knowingly collect personal information from children. If you believe a child has sent personal information by email, contact the address above and it will be deleted.</p>
+      </section>
+
+      <section class="card" style="margin-bottom: var(--s-4)">
+        <h2 class="card-title">12. Changes to this policy</h2>
+        <p class="text-muted">This policy may be updated when the site's features, hosting or advertising arrangements change. The “Last updated” date at the top of the page shows the current version. Material changes — especially the introduction of advertising, analytics or a new third-party service — will be reflected here before the change takes effect.</p>
+      </section>
+
+      <section class="card" style="margin-bottom: var(--s-4)">
+        <h2 class="card-title">13. Who runs AuraFlow</h2>
+        <p class="text-muted">AuraFlow is an independent, open-source project maintained by Suzain. It is not a company, and it has no separate data-protection officer. Privacy questions, security reports and legal notices can be sent to <a href="mailto:thisissaddu3@gmail.com">thisissaddu3@gmail.com</a> or through the <a href="./contact.html">contact page</a>.</p>
       </section>
 
       <div class="card" style="background: var(--accent-soft); border-color: rgba(79,124,255,0.3)">
         <h2 class="card-title">The one-line version</h2>
-        <p style="margin-bottom:0">Your files stay on your device. Full stop.</p>
+        <p style="margin-bottom:0">Your file contents stay on your device. The host sees normal web requests, not your documents — and no advertising or analytics is active today.</p>
       </div>
 
       <p class="text-sm text-muted" style="color: var(--text-faint); margin-top: var(--s-6)" id="contact-note">Questions or a privacy report request? Use the <a href="./contact.html">contact page</a> or email <a href="mailto:thisissaddu3@gmail.com">thisissaddu3@gmail.com</a> — it's a real inbox, not a form-theater.</p>

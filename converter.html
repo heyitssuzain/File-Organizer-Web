@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Free File Converter — Images, PDF, CSV, JSON &amp; XLSX | AuraFlow</title>
+  <title>Free File Converter — Images, Text &amp; Data | AuraFlow</title>
   <meta name="description" content="Convert PNG, JPG, WebP, BMP, TXT, Markdown, HTML, CSV, TSV and JSON locally in your browser. No uploads, no accounts, no file storage." />
   <link rel="canonical" href="__BASE_URL__/converter.html" />
   <meta property="og:type" content="website" />
@@ -12,6 +12,10 @@
   <meta property="og:description" content="Convert images, text documents and data files locally. Choose an output, convert, download — your files never leave your device." />
   <meta property="og:url" content="__BASE_URL__/converter.html" />
   <meta property="og:image" content="__BASE_URL__/og-cover.png" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="AuraFlow Web — private file organizer, converter and PDF toolkit" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="AuraFlow File Converter — Local, Private, Fast" />
   <meta name="twitter:description" content="Convert images, documents and data files without uploading them." />
@@ -234,6 +238,73 @@
           </div>
         </aside>
       </div>
+
+      <section class="section" aria-labelledby="converter-guide" style="padding-top: var(--s-6)">
+        <div class="section-head">
+          <span class="eyebrow">Practical guide</span>
+          <h2 id="converter-guide">Pick the right output the first time</h2>
+          <p>The converter deliberately supports a focused set of formats. That keeps every conversion predictable and fully local. Here is what each group is good for, plus the limits that matter before you convert a batch.</p>
+        </div>
+
+        <div class="card" style="margin-bottom: var(--s-4)">
+          <h3 class="card-title">Supported conversions</h3>
+          <div class="table-wrap"><table class="text-sm" style="width:100%; border-collapse:collapse">
+            <thead><tr><th scope="col" style="text-align:left; padding:8px 8px 8px 0">Input</th><th scope="col" style="text-align:left">Outputs</th><th scope="col" style="text-align:left">Best for</th></tr></thead>
+            <tbody style="color:var(--text-muted)">
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">PNG, JPG/JPEG, WebP, BMP, GIF, SVG, AVIF, ICO</td><td>PNG, JPG/JPEG, WebP, BMP</td><td>Preparing photos for the web, flattening transparency onto a colour, converting screenshots or scanned images</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">TXT, Markdown, HTML</td><td>PDF, HTML, MD, TXT (never the same source format)</td><td>Turning notes into a printable PDF, extracting readable text from an HTML file, switching between Markdown and plain text</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">CSV, TSV, JSON</td><td>CSV, JSON, XLSX</td><td>Opening a JSON export in Excel, normalising delimiters, producing a spreadsheet from a data dump</td></tr>
+            </tbody>
+          </table></div>
+          <p class="text-sm text-muted" style="margin: var(--s-3) 0 0">PDF is an input only for the <a href="./pdf-merger.html">PDF Merger</a>; this converter does not turn PDFs into Word documents or images. Audio and video conversion is not offered because no dependable local engine is bundled.</p>
+        </div>
+
+        <div class="grid grid-2" style="margin-bottom: var(--s-4)">
+          <div class="card">
+            <h3 class="card-title">Three useful examples</h3>
+            <ul class="text-muted text-sm" style="padding-left:1.1rem; display:grid; gap:.5rem; margin-bottom:0">
+              <li><strong>Shrink a set of phone photos:</strong> choose JPG output, set the maximum dimension to 1600 px, and leave quality at 92%. The originals stay untouched; download the resized copies individually or as a ZIP.</li>
+              <li><strong>Turn meeting notes into a PDF:</strong> add a Markdown file, choose PDF, then set A4 and 18 mm margins. The PDF uses a bundled font and rejects characters the font cannot draw instead of producing blank boxes.</li>
+              <li><strong>Open a JSON export in a spreadsheet:</strong> choose XLSX. Values are written as inline strings, so a cell beginning with <code>=</code> stays text and is never executed as a formula.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="card-title">What will not survive</h3>
+            <ul class="text-muted text-sm" style="padding-left:1.1rem; display:grid; gap:.5rem; margin-bottom:0">
+              <li>GIF animation: only the first frame is converted.</li>
+              <li>HTML layout: HTML → PDF extracts readable text, not CSS columns, colours or embedded images.</li>
+              <li>CJK and emoji in text → PDF: the bundled Noto Sans font does not include them, so conversion fails with the exact missing characters.</li>
+              <li>Spreadsheet formulas, styles or multiple sheets: XLSX output is a single, plain data sheet and is never read back.</li>
+              <li>Original EXIF metadata: images are re-encoded through Canvas; orientation is applied, but other metadata is not preserved.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: var(--s-4)">
+          <h3 class="card-title">Frequently asked questions</h3>
+          <div class="grid" style="gap: var(--s-2)">
+            <details><summary style="font-weight:600; cursor:pointer">Are my files uploaded during conversion?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">No. The browser reads the bytes you selected, converts them in memory, and creates a local download. The page loads only its own assets. See the <a href="./privacy.html">privacy policy</a> for the hosting details that apply to any website.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Is converting an image lossless?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">PNG output is lossless, and a same-format image conversion with no resize is passed through byte-for-byte. JPG and WebP are re-encoded at the quality you choose; BMP is uncompressed, so files are usually larger. Converting JPEG → PNG cannot restore detail that JPEG already discarded.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Can I convert several files at once?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">Yes, up to 50 files per batch, 150 MB per file and 300 MB total. Each file keeps its own output choice. Use <em>Download all as ZIP</em> when more than one result is ready.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Why is an unsupported file rejected instead of converted?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">The converter only offers outputs it can actually produce locally. A file is rejected when its format is not in the supported list, when the browser cannot decode it, or when it exceeds the size limit. Nothing is silently skipped or replaced with a placeholder.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Does it run in the background?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">No. Conversion happens while the tab is open and progresses one file at a time to keep memory predictable. Closing or reloading the page discards the queue and all un-downloaded results.</p></details>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Troubleshooting</h3>
+          <div class="table-wrap"><table class="text-sm" style="width:100%; border-collapse:collapse">
+            <thead><tr><th scope="col" style="text-align:left; padding:8px 8px 8px 0">Message or symptom</th><th scope="col" style="text-align:left">Fix</th></tr></thead>
+            <tbody style="color:var(--text-muted)">
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">“This format is not supported by the local converter”</td><td>The extension or MIME type is outside the supported list. Convert it with a desktop tool first, or use a supported input.</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">“This browser cannot decode that image format”</td><td>The file is corrupt, mislabelled, or uses a codec your browser lacks. Try opening it in an image viewer, then re-save it as PNG or JPG.</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">PDF text conversion rejects characters</td><td>The bundled font lacks those glyphs (often CJK or emoji). Export as HTML or TXT instead, or remove/replace the characters.</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">A large batch stops or the tab slows</td><td>Browser memory is finite. Split the batch, lower the image resolution, and close other memory-heavy tabs. No partial file is uploaded anywhere.</td></tr>
+              <tr><td style="padding:8px 8px 8px 0">The downloaded file will not open</td><td>Confirm the output extension matches the chosen format, and try opening it in a different application. If it still fails, keep the original and report the browser, input format and exact error on the <a href="./contact.html">contact page</a>.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </section>
     </div>
   </main>
 

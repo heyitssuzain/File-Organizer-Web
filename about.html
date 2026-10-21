@@ -11,6 +11,15 @@
   <meta property="og:description" content="From a free Windows app to a browser edition: the story, the philosophy, and an honest desktop vs. web comparison." />
   <meta property="og:url" content="__BASE_URL__/about.html" />
   <meta property="og:image" content="__BASE_URL__/og-cover.png" />
+  <meta property="og:site_name" content="AuraFlow Web" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="AuraFlow Web — private file organizer, converter and PDF toolkit" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="About AuraFlow — A File Organizer You Can Trust" />
+  <meta name="twitter:description" content="From a free Windows app to a browser edition: the story, the philosophy, and an honest desktop vs. web comparison." />
+  <meta name="twitter:image" content="__BASE_URL__/og-cover.png" />
   <meta name="theme-color" content="#0d0e12" />
   <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
   <script type="application/ld+json">
@@ -26,6 +35,14 @@
       "jobTitle": "Independent developer",
       "url": "https://github.com/heyitssuzain",
       "sameAs": ["https://github.com/heyitssuzain"]
+    },
+    "isPartOf": { "@type": "WebSite", "name": "AuraFlow Web", "url": "__BASE_URL__/" },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "__BASE_URL__/" },
+        { "@type": "ListItem", "position": 2, "name": "About", "item": "__BASE_URL__/about.html" }
+      ]
     }
   }
   </script>
@@ -46,11 +63,12 @@
         <span class="eyebrow">About</span>
         <h1 style="font-size: var(--fs-2xl)">Sort first. Ask permission. Undo your mistakes.</h1>
         <p class="text-muted">AuraFlow exists because folder chaos is universal and most solutions are either subscription software or silent auto-helpers that move things without asking.</p>
+        <p class="text-sm text-muted">Last updated: October 21, 2026</p>
       </header>
 
       <section class="card" style="margin-bottom: var(--s-4)">
         <h2 class="card-title">The story so far</h2>
-        <p class="text-muted">AuraFlow started as a Windows desktop app: a fast file organizer with a preview screen, one-click undo and a completely offline workflow. It's free and open source — <a target="_blank" rel="noopener" href="https://github.com/heyitssuzain/File-Organiser">the desktop project lives on GitHub</a>, shipped as a lean ~26 MB executable that doesn't even need Python installed.</p>
+        <p class="text-muted">AuraFlow started as a Windows desktop app: a fast file organizer with a preview screen, one-click undo and a completely offline workflow. It's free and open source — <a target="_blank" rel="noopener noreferrer" href="https://github.com/heyitssuzain/File-Organiser">the desktop project lives on GitHub</a>, shipped as a lean ~26 MB executable that doesn't even need Python installed.</p>
         <p class="text-muted">AuraFlow Web is its browser sibling: the same category engine and preview-first philosophy, reimplemented with browser technologies so it works on any OS — Windows, macOS, Linux, ChromeOS — without installing anything. The web edition's category lists, collision-renaming rules (-<code>_1</code>, -<code>_2</code>) and exclusion filters are direct ports of the desktop's proven logic, and this site's own test suite verifies that parity.</p>
         <p class="text-muted">The browser edition has also grown into a small local toolkit: a file converter, an image-to-PDF builder and a PDF merger. They follow the same rule as the organizer — your files stay in the tab — and they state their format limits instead of hiding them behind a progress bar.</p>
       </section>
@@ -90,11 +108,11 @@
       <div class="grid grid-2">
         <div class="card">
           <h2 class="card-title">Who builds this</h2>
-          <p class="text-muted">AuraFlow is an independent open-source project by Suzain (<a target="_blank" rel="noopener" href="https://github.com/heyitssuzain">@heyitssuzain</a>), MIT licensed. No company and no tracking. The site is free; any future advertising will be clearly disclosed and kept away from your file operations. Questions and bug reports: <a href="./contact.html">contact page</a> or <a href="mailto:thisissaddu3@gmail.com">thisissaddu3@gmail.com</a>.</p>
+          <p class="text-muted">AuraFlow is an independent open-source project by Suzain (<a target="_blank" rel="noopener noreferrer" href="https://github.com/heyitssuzain">@heyitssuzain</a>), MIT licensed. No company and no tracking. The site is free; any future advertising will be clearly disclosed and kept away from your file operations. Questions and bug reports: <a href="./contact.html">contact page</a> or <a href="mailto:thisissaddu3@gmail.com">thisissaddu3@gmail.com</a>.</p>
         </div>
         <div class="card">
-          <h2 class="card-title">What's next</h2>
-          <p class="text-muted" style="margin-bottom:0">Improvements land in the open: better date-organization options, more granular conflict handling, deeper recursive scans where memory allows. The desktop app remains the reference implementation — the web edition follows its lead.</p>
+          <h2 class="card-title">How the project is funded</h2>
+          <p class="text-muted" style="margin-bottom:0">AuraFlow is free and has no paid tier, account requirement or upsell. If display advertising is added later, it will be clearly labelled, kept away from file pickers, progress controls and download buttons, and disclosed in the <a href="./privacy.html">privacy policy</a>. No advertiser can pay for a recommendation on this site, and no ad will ever be required to use a tool.</p>
         </div>
       </div>
     </div>

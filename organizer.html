@@ -11,6 +11,15 @@
   <meta property="og:description" content="Pick a folder, preview every destination, and sort files into clean categories — locally in your browser." />
   <meta property="og:url" content="__BASE_URL__/organizer.html" />
   <meta property="og:image" content="__BASE_URL__/og-cover.png" />
+  <meta property="og:site_name" content="AuraFlow Web" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="AuraFlow Web — private file organizer, converter and PDF toolkit" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Organize Files Online — Free File Organizer" />
+  <meta name="twitter:description" content="Pick a folder, preview every destination, and sort files into clean categories — locally in your browser." />
+  <meta name="twitter:image" content="__BASE_URL__/og-cover.png" />
   <meta name="theme-color" content="#0d0e12" />
   <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
   <script type="application/ld+json">
@@ -23,7 +32,14 @@
     "operatingSystem": "Any (modern web browser)",
     "isAccessibleForFree": true,
     "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-    "isPartOf": { "@type": "WebSite", "name": "AuraFlow Web", "url": "__BASE_URL__/" }
+    "isPartOf": { "@type": "WebSite", "name": "AuraFlow Web", "url": "__BASE_URL__/" },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        { "@type": "ListItem", "position": 1, "name": "Home", "item": "__BASE_URL__/" },
+        { "@type": "ListItem", "position": 2, "name": "File Organizer", "item": "__BASE_URL__/organizer.html" }
+      ]
+    }
   }
   </script>
 </head>
@@ -204,6 +220,78 @@
 
       <!-- Safety note -->
       <p class="text-xs text-faint" style="margin-top: var(--s-6)">AuraFlow never uploads your files and never runs anything in the background. Organizing only happens while this tab is open, only for files you chose.</p>
+
+      <!-- Supporting content: real instructions, limits and troubleshooting -->
+      <section class="section" aria-labelledby="organizer-guide" style="padding-top: var(--s-6)">
+        <div class="section-head">
+          <span class="eyebrow">How it works</span>
+          <h2 id="organizer-guide">Organize a folder without gambling with your files</h2>
+          <p>Most file organizers ask you to trust a progress bar. This one shows you the complete plan first, keeps every original until the copy is verified, and never overwrites an existing name. Everything below describes the actual browser behaviour.</p>
+        </div>
+
+        <div class="card" style="margin-bottom: var(--s-4)">
+          <h3 class="card-title">Step by step</h3>
+          <ol class="text-muted" style="padding-left: 1.2rem; display:grid; gap: .55rem; margin-bottom:0">
+            <li><strong>Choose a source.</strong> Select a folder in Chrome or Edge for direct sorting, select individual files, or drag files/folders onto the drop panel. Nothing is read until you do this.</li>
+            <li><strong>Review the plan.</strong> Every file gets a category and a destination. Use <em>By type</em>, <em>By extension</em> or <em>By date</em>; the totals and conflict badges update immediately.</li>
+            <li><strong>Check the edge cases.</strong> Temporary and system files are skipped by default. Unknown extensions go to <em>Others</em> — they are never discarded. Name collisions get <code>_1</code>, <code>_2</code> and so on.</li>
+            <li><strong>Choose Move or Copy.</strong> Move writes a full copy, verifies its size, then removes the original. Copy leaves every original in place. If your browser cannot remove the source, the app reports a copy instead of pretending it moved.</li>
+            <li><strong>Confirm, then keep the manifest.</strong> A run summary lists every destination and any error. Download the JSON, CSV or TXT manifest for an audit trail; use <em>Undo this run</em> while the tab remains open.</li>
+          </ol>
+        </div>
+
+        <div class="grid grid-2" style="margin-bottom: var(--s-4)">
+          <div class="card">
+            <h3 class="card-title">Supported files and real limits</h3>
+            <ul class="text-muted text-sm" style="padding-left: 1.1rem; margin-bottom:0; display:grid; gap:.35rem">
+              <li>11 categories: Documents, Images, Videos, Audio, Archives, Code, Executables, Design &amp; 3D, Fonts, Data, Others.</li>
+              <li>Extensions are case-insensitive. Detection uses the filename extension, not the file's contents.</li>
+              <li>Folder reads stop at 3 levels deep and 5,000 files per selection.</li>
+              <li>Organized ZIP downloads are stored (uncompressed) and capped at 2 GB of selected files.</li>
+              <li>Duplicate detection hashes files up to 512 MB; larger files still organize normally.</li>
+              <li>Direct folder writing needs the File System Access API (Chromium desktop browsers). Firefox, Safari and mobile browsers get the ZIP instead.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="card-title">A realistic example</h3>
+            <p class="text-muted text-sm">A Downloads folder contains 240 files: installers, PDF invoices, screenshots, a few ZIPs and two copies of the same presentation. Choose <em>By type</em> and the plan proposes:</p>
+            <ul class="text-muted text-sm" style="padding-left:1.1rem">
+              <li><code>Documents/</code> for the invoices and presentation</li>
+              <li><code>Images/</code> for screenshots and photos</li>
+              <li><code>Executables/</code> for installers</li>
+              <li><code>Archives/</code> for ZIPs</li>
+            </ul>
+            <p class="text-muted text-sm" style="margin-bottom:0">The duplicate presentation is flagged only when its content hashes match. If both files are kept, the second is renamed rather than overwriting the first.</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: var(--s-4)">
+          <h3 class="card-title">Frequently asked questions</h3>
+          <div class="grid" style="gap: var(--s-2)">
+            <details><summary style="font-weight:600; cursor:pointer">Does the organizer upload my files?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">No. The categorization, duplicate hashing, previews and ZIP creation run in this tab. The only network requests are for the page and its own assets; your filenames and file bytes are not sent to a server.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Why does Chrome refuse to open my Downloads or Documents folder?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">Chromium protects certain system locations and returns “Cannot open this folder because it contains system files.” Use <em>Select files</em> and press Ctrl+A in the picker, choose a subfolder, or drag the files in. This is a browser rule, not an AuraFlow limitation.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">What is the difference between Move and Copy?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">Move is a verified copy followed by removal of the original. Copy writes the destination and leaves the original untouched. If removal is unavailable or the source changed after the scan, the result is labelled as a copy — never as a move.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Will an existing file be overwritten?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">No. The plan checks names in the plan and, for folder sorting, the files already in each destination folder. A collision becomes <code>name_1.ext</code> instead. The destination name is checked again immediately before writing.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Can I undo a run?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">Yes for true moves made through a picked folder, while the same tab stays open. Moves of individually selected files cannot be undone because the browser never exposes their parent folder. Copied files are intentionally not removed by undo.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Does it work offline?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">Once the page and its assets have loaded, the current tab can keep processing without a network connection. There is no service worker, so opening the site again from scratch still needs a connection.</p></details>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Troubleshooting</h3>
+          <div class="table-wrap"><table class="text-sm" style="width:100%; border-collapse:collapse">
+            <thead><tr><th scope="col" style="text-align:left; padding:8px 8px 8px 0">What you see</th><th scope="col" style="text-align:left">What to do</th></tr></thead>
+            <tbody style="color:var(--text-muted)">
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">Nothing appears after selecting</td><td>The file type may be excluded, or the folder's contents are deeper than 3 levels. Check the skip notes in the plan.</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">A move fails with “permission denied”</td><td>The file may be open in another program or the folder lost write access. Close the other app and run again; files already processed are not affected.</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">Results say “copied — original kept”</td><td>The browser could not remove the source, or the source changed after the scan. Use the manifest to clean up manually, or retry from a folder selection.</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">ZIP exceeds the 2 GB limit</td><td>Organize in smaller batches, or use Chrome/Edge for direct folder sorting and undo.</td></tr>
+              <tr><td style="padding:8px 8px 8px 0">The page feels slow on a huge folder</td><td>Selections are capped at 5,000 files for a reason. Split the job and close other heavy tabs to free memory.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </section>
+
     </div>
   </main>
 

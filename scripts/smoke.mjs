@@ -16,7 +16,7 @@
 import { chromium } from 'playwright';
 import { mkdirSync, readFileSync } from 'node:fs';
 
-const BASE = process.env.BASE_URL ?? 'http://localhost:4173/File-Organizer-Web/';
+const BASE = process.env.BASE_URL ?? 'http://localhost:4173/';
 const shot = 'artifacts';
 mkdirSync(shot, { recursive: true });
 
@@ -335,7 +335,7 @@ const url = (p) => `${BASE}${p}`;
 // ---------- 7b. deployment headers support the toolkit ----------
 {
   const config = JSON.parse(readFileSync('vercel.json', 'utf8'));
-  const csp = config.headers?.[0]?.headers?.find((h) => h.key === 'Content-Security-Policy')?.value ?? '';
+  const csp = config.headers?.find((h) => h.source === '/(.*)')?.headers?.find((h) => h.key === 'Content-Security-Policy')?.value ?? '';
   const redirects = (config.redirects ?? []).map((r) => `${r.source}→${r.destination}`);
   record(
     'deployed CSP allows same-origin workers, blob previews and bundled fonts',

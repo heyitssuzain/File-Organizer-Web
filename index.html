@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Free Private File Toolkit — Organize, Convert &amp; Merge | AuraFlow</title>
+  <title>Free File Organizer &amp; Private File Toolkit | AuraFlow</title>
   <meta name="description" content="Organize folders, convert images and documents, combine photos into PDF and merge PDFs in your browser. Preview every change, keep files on your device." />
   <link rel="canonical" href="__BASE_URL__/" />
   <meta property="og:type" content="website" />
@@ -12,6 +12,10 @@
   <meta property="og:description" content="Organize, convert and combine files in your browser. Preview every change, avoid overwrites, and keep files on your device." />
   <meta property="og:url" content="__BASE_URL__/" />
   <meta property="og:image" content="__BASE_URL__/og-cover.png" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="AuraFlow Web — private file organizer, converter and PDF toolkit" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="AuraFlow Web — Your Files. Finally Organized." />
   <meta name="twitter:description" content="A privacy-first file toolkit. Organize folders, convert files and build PDFs locally — files never leave your device." />
@@ -243,10 +247,10 @@
           <h2 id="use-h">Where the mess actually happens</h2>
         </div>
         <div class="grid grid-4" style="margin-top: var(--s-5)">
-          <div class="card reveal"><h3>🪨 Downloads folder</h3><p>Installers, PDFs, screenshots and ZIPs into calm category folders — by type or by month.</p></div>
-          <div class="card reveal"><h3>🖥️ Desktop cleanup</h3><p>Screenshot 214? screenshot 215? Send them to Images while documents stay put.</p></div>
-          <div class="card reveal"><h3>📁 Project handovers</h3><p>Group deliverables, produce a manifest, hand over a folder that makes sense to other people.</p></div>
-          <div class="card reveal"><h3>💾 SD card offload</h3><p>Photos, clips and voice notes sorted before they hit your long-term storage.</p></div>
+          <div class="card reveal"><h3><span aria-hidden="true">🪨</span> Downloads folder</h3><p>Installers, PDFs, screenshots and ZIPs into calm category folders — by type or by month.</p></div>
+          <div class="card reveal"><h3><span aria-hidden="true">🖥️</span> Desktop cleanup</h3><p>Screenshot 214? screenshot 215? Send them to Images while documents stay put.</p></div>
+          <div class="card reveal"><h3><span aria-hidden="true">📁</span> Project handovers</h3><p>Group deliverables, produce a manifest, hand over a folder that makes sense to other people.</p></div>
+          <div class="card reveal"><h3><span aria-hidden="true">💾</span> SD card offload</h3><p>Photos, clips and voice notes sorted before they hit your long-term storage.</p></div>
         </div>
       </div>
     </section>
@@ -264,7 +268,7 @@
           <details class="card reveal" style="padding: var(--s-4) var(--s-5)"><summary style="font-weight:600; cursor:pointer">What can the file converter do?</summary><p class="text-muted" style="margin: var(--s-3) 0 0">Images: PNG, JPG/JPEG, WebP and BMP from PNG, JPG, WebP, BMP, GIF, SVG and AVIF. Text: TXT, Markdown and HTML to PDF, HTML, MD or TXT. Data: CSV, TSV and JSON to CSV, JSON or XLSX. You can convert up to 50 files per batch and download them individually or as a ZIP. <a href="./converter.html">Open the converter</a>.</p></details>
           <details class="card reveal" style="padding: var(--s-4) var(--s-5)"><summary style="font-weight:600; cursor:pointer">Can I combine images into a PDF or merge PDFs?</summary><p class="text-muted" style="margin: var(--s-3) 0 0">Yes. Image → PDF supports previews, reordering, rotation, A4/Letter/original pages, orientation, fit and margins. PDF Merger combines files in the order you choose without rasterizing pages, so selectable text and vectors stay intact. <a href="./image-to-pdf.html">Make a PDF</a> or <a href="./pdf-merger.html">merge PDFs</a>.</p></details>
           <details class="card reveal" style="padding: var(--s-4) var(--s-5)"><summary style="font-weight:600; cursor:pointer">What are the conversion limits?</summary><p class="text-muted" style="margin: var(--s-3) 0 0">HTML → PDF extracts readable text rather than reproducing the page layout. XLSX export is one-way, not an XLSX reader. Text PDFs use a bundled Latin/Greek/Cyrillic font, so CJK and emoji are rejected with the exact missing characters instead of producing blank glyphs. Merged PDFs keep page content and dimensions, but bookmarks, forms and embedded files are not guaranteed. <a href="./features.html#compatibility">Full limits</a>.</p></details>
-          <details class="card reveal" style="padding: var(--s-4) var(--s-5)"><summary style="font-weight:600; cursor:pointer">Are my files uploaded anywhere?</summary><p class="text-muted" style="margin: var(--s-3) 0 0">No. There is no server involved in organizing — everything runs as JavaScript in your own browser tab. You can even use it offline once the page has loaded.</p></details>
+          <details class="card reveal" style="padding: var(--s-4) var(--s-5)"><summary style="font-weight:600; cursor:pointer">How do I undo an organization run?</summary><p class="text-muted" style="margin: var(--s-3) 0 0">In Chrome or Edge, when you sort inside a folder you picked, the results screen keeps an <em>Undo this run</em> button for as long as the tab stays open. Moves made from individually selected files cannot be undone because browsers do not expose their parent folder; the downloadable manifest still lists every original and destination path so you can reverse the change yourself.</p></details>
           <details class="card reveal" style="padding: var(--s-4) var(--s-5)"><summary style="font-weight:600; cursor:pointer">Can it organize into a real folder on my disk?</summary><p class="text-muted" style="margin: var(--s-3) 0 0">Yes, in Chromium browsers (Chrome, Edge, Opera, Brave) via the File System Access API — you explicitly grant "read &amp; write" for the folder you pick. Firefox and Safari don't support folder writes yet, so AuraFlow offers an organized ZIP download there instead. <a href="./features.html#compatibility">Details</a></p></details>
           <details class="card reveal" style="padding: var(--s-4) var(--s-5)"><summary style="font-weight:600; cursor:pointer">Will it overwrite my existing files?</summary><p class="text-muted" style="margin: var(--s-3) 0 0">Never. Collisions are detected before the run against both the plan itself and the files already present in the destination folder; extra copies get a safe <code>_1</code> suffix, identical to the desktop app's behaviour.</p></details>
           <details class="card reveal" style="padding: var(--s-4) var(--s-5)"><summary style="font-weight:600; cursor:pointer">Is it really free?</summary><p class="text-muted" style="margin: var(--s-3) 0 0">Yes — the web edition and the Windows desktop app are both free and open source (MIT). No accounts, no subscriptions, no locked features.</p></details>

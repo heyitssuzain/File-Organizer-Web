@@ -158,23 +158,25 @@ folder is not exposed.
 
 ```bash
 npm install
-npm run dev        # http://localhost:5173/File-Organizer-Web/
+npm run dev        # http://localhost:5173/ (BASE defaults to /)
 npm run typecheck  # strict TypeScript check
 npm test           # unit tests
 npm run build      # production build + unit typecheck
 npm run preview    # serve dist/
 ```
 
-The default base is `/File-Organizer-Web/` for GitHub Pages project sites. For Vercel or a custom
-domain, create `.env`:
+The build defaults match Vercel production (`BASE=/`,
+`CANONICAL_BASE_URL=https://online-file-organizer.vercel.app/`), so a plain
+`npm run build` publishes correct canonicals, `sitemap.xml` and `robots.txt`.
+For GitHub Pages or a custom domain, create `.env` and override both values:
 
 ```
-BASE=/
-CANONICAL_BASE_URL=https://online-file-organizer.vercel.app/
+BASE=/File-Organizer-Web/
+CANONICAL_BASE_URL=https://heyitssuzain.github.io/File-Organizer-Web/
 ```
 
-Then rebuild. Canonical URLs, Open Graph URLs, `sitemap.xml` and `robots.txt` derive from
-`CANONICAL_BASE_URL`.
+Canonical URLs, Open Graph URLs, `sitemap.xml` and `robots.txt` derive from
+`CANONICAL_BASE_URL`. If you add a custom domain later, update it and redeploy.
 
 ## Testing
 
@@ -281,7 +283,7 @@ File-Organizer-Web/
 
 ### Vercel
 
-Use the production repository and set:
+Use the production repository. The build defaults already target Vercel:
 
 ```
 BASE=/
@@ -289,13 +291,16 @@ CANONICAL_BASE_URL=https://online-file-organizer.vercel.app/
 ```
 
 Build command: `npm run build`. Output: `dist`. `vercel.json` adds permanent redirects from
-`/index.html` and `/guides/index.html` and sets CSP, HSTS, referrer, permissions and framing headers.
+`/index.html` and `/guides/index.html`, cache headers for hashed assets, and CSP, HSTS, referrer,
+permissions, framing and cross-origin headers. Override the two environment variables only if the
+final domain differs.
 
 ### GitHub Pages
 
-The default `BASE=/File-Organizer-Web/` matches a project site. Push `dist/` to `gh-pages`, or use an
-action that builds and deploys it. The generated `sitemap.xml` and `robots.txt` use the configured
-canonical origin.
+Set `BASE=/File-Organizer-Web/` and
+`CANONICAL_BASE_URL=https://heyitssuzain.github.io/File-Organizer-Web/` in `.env`, then push
+`dist/` to `gh-pages`, or use an action that builds and deploys it. The generated `sitemap.xml` and
+`robots.txt` use the configured canonical origin.
 
 ## Third-party licenses
 

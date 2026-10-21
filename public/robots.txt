@@ -1,6 +1,7 @@
 # AuraFlow Web — robots.txt
-# Public marketing pages, guides, and the organizer tool page are crawlable.
-# The 404 page is excluded via a noindex meta tag.
+# Public marketing pages, guides and tool pages are crawlable.
+# 404.html is excluded with a noindex meta tag and is not in the sitemap.
+# This file is regenerated at build time from CANONICAL_BASE_URL.
 
 User-agent: *
 Allow: /

@@ -5,8 +5,13 @@ import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
 /**
  * Multi-page app config.
  *
- * BASE: for GitHub Pages project sites the site lives under
- * /File-Organizer-Web/. Set BASE=/ for a custom domain (env override in .env).
+ * Production is served at the Vercel domain root. These defaults intentionally
+ * match the live site so a plain `npm run build` cannot silently publish
+ * GitHub-Pages canonicals/sitemap URLs to Vercel.
+ *
+ * GitHub Pages (project site) builds must override both values in `.env`:
+ *   BASE=/File-Organizer-Web/
+ *   CANONICAL_BASE_URL=https://heyitssuzain.github.io/File-Organizer-Web/
  */
 
 function readEnv(key: string): string | null {
@@ -19,11 +24,11 @@ function readEnv(key: string): string | null {
   }
 }
 
-const BASE = process.env.BASE || readEnv('BASE') || '/File-Organizer-Web/';
+const BASE = process.env.BASE || readEnv('BASE') || '/';
 const CANONICAL =
   process.env.CANONICAL_BASE_URL ||
   readEnv('CANONICAL_BASE_URL') ||
-  'https://heyitssuzain.github.io/File-Organizer-Web/';
+  'https://online-file-organizer.vercel.app/';
 const CANONICAL_BASE = CANONICAL.endsWith('/') ? CANONICAL : `${CANONICAL}/`;
 
 /** Replaces __BASE_URL__ at serve/build time without mutating source files. */

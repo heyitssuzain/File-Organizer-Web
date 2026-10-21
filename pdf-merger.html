@@ -12,6 +12,10 @@
   <meta property="og:description" content="Merge PDFs locally. Keep text selectable and vectors sharp. Reorder files, see page counts, download the result." />
   <meta property="og:url" content="__BASE_URL__/pdf-merger.html" />
   <meta property="og:image" content="__BASE_URL__/og-cover.png" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="AuraFlow Web — private file organizer, converter and PDF toolkit" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="AuraFlow PDF Merger — Local and Private" />
   <meta name="twitter:description" content="Merge PDFs in your browser. No uploads, no accounts." />
@@ -179,6 +183,65 @@
           </div>
         </aside>
       </div>
+
+      <section class="section" aria-labelledby="pdf-merge-guide" style="padding-top: var(--s-6)">
+        <div class="section-head">
+          <span class="eyebrow">Practical guide</span>
+          <h2 id="pdf-merge-guide">Combine PDFs without flattening them into pictures</h2>
+          <p>Merging is usually the last step before sending a document to someone. This tool copies pages from each source, in the order shown in the queue, and writes one new PDF locally. Text stays text, vectors stay sharp, and page sizes are preserved.</p>
+        </div>
+
+        <div class="grid grid-2" style="margin-bottom: var(--s-4)">
+          <div class="card">
+            <h3 class="card-title">Good uses</h3>
+            <ul class="text-muted text-sm" style="padding-left:1.1rem; display:grid; gap:.5rem; margin-bottom:0">
+              <li>Combine a cover letter, CV and references into one application PDF.</li>
+              <li>Join monthly invoices or receipts into a single archive for an accountant.</li>
+              <li>Assemble a contract from separately reviewed sections while keeping signatures intact.</li>
+              <li>Put scanned forms and digitally generated pages into one document without recompressing either.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="card-title">What survives — and what may not</h3>
+            <div class="table-wrap"><table class="text-sm" style="width:100%; border-collapse:collapse">
+              <tbody style="color:var(--text-muted)">
+                <tr><td style="padding:7px 10px 7px 0">Page order, dimensions and orientation</td><td>Preserved</td></tr>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:7px 10px 7px 0">Selectable text, fonts and vector artwork</td><td>Preserved</td></tr>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:7px 10px 7px 0">Form fields and links</td><td>Not guaranteed</td></tr>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:7px 10px 7px 0">Bookmarks / outlines</td><td>Not guaranteed</td></tr>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:7px 10px 7px 0">Embedded files and rare annotations</td><td>Not guaranteed</td></tr>
+                <tr><td style="padding:7px 10px 7px 0">Password-protected PDFs</td><td>Rejected until unlocked</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: var(--s-4)">
+          <h3 class="card-title">Frequently asked questions</h3>
+          <div class="grid" style="gap: var(--s-2)">
+            <details><summary style="font-weight:600; cursor:pointer">Are my PDFs uploaded for merging?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">No. Files are read in the tab, copied in a local Web Worker with pdf-lib, and returned as a download. The site has no merge endpoint and no document storage. See the <a href="./privacy.html">privacy policy</a> for hosting-level request metadata.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Does merging reduce quality?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">Pages are copied rather than rasterized, so text, images and vectors are not re-rendered as a screenshot. The output may still be larger than the sum of the inputs because shared resources can be duplicated by the PDF library.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Can I merge selected pages instead of whole files?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">Not in this version. The queue works at file level: every page of every added PDF is included. To omit pages, create trimmed copies in a PDF editor first, then add those files.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Why is my encrypted PDF rejected?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">The local library cannot open password-protected files safely without a password prompt. AuraFlow does not ask for or transmit passwords. Unlock the document in your PDF reader, export an unprotected copy, and add that copy instead.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">What is the batch limit?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">Up to 40 PDFs or 300 MB per batch. Page counts are read locally before merging so you can spot an unexpectedly large or empty file first.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Does the merged PDF keep metadata?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">The output is created fresh with neutral AuraFlow metadata (title, creator and dates). Source document metadata, bookmarks and forms should not be relied on. The visible page content is what is preserved.</p></details>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Troubleshooting</h3>
+          <div class="table-wrap"><table class="text-sm" style="width:100%; border-collapse:collapse">
+            <thead><tr><th scope="col" style="text-align:left; padding:8px 8px 8px 0">Problem</th><th scope="col" style="text-align:left">What to try</th></tr></thead>
+            <tbody style="color:var(--text-muted)">
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">“This file could not be read as a PDF”</td><td>The file may be damaged or use an unsupported feature. Open it in a PDF reader and re-export/save a clean copy, then add it again.</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">Pages are in the wrong order</td><td>Drag the file rows or use the arrow buttons. The queue order, top to bottom, is the final page order.</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">The merge button stays disabled</td><td>Remove invalid or encrypted files. The queue blocks merging while any entry cannot be read.</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">The download is unexpectedly large</td><td>Merge fewer files at once, or compress the source PDFs in a PDF editor first. The merger does not recompress page content.</td></tr>
+              <tr><td style="padding:8px 8px 8px 0">The tab slows or crashes</td><td>Large jobs consume real memory. Split the merge into two documents and combine those afterwards if necessary.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </section>
     </div>
   </main>
 

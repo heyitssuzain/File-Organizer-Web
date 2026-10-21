@@ -12,6 +12,10 @@
   <meta property="og:description" content="Build a print-ready PDF from images. Reorder, rotate, pick page size and margins — no upload, no account." />
   <meta property="og:url" content="__BASE_URL__/image-to-pdf.html" />
   <meta property="og:image" content="__BASE_URL__/og-cover.png" />
+  <meta property="og:locale" content="en_US" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:image:alt" content="AuraFlow Web — private file organizer, converter and PDF toolkit" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="Image to PDF — Local, Private, Print-Ready" />
   <meta name="twitter:description" content="Combine images into one PDF without uploading them." />
@@ -224,6 +228,65 @@
           </div>
         </aside>
       </div>
+
+      <section class="section" aria-labelledby="image-pdf-guide" style="padding-top: var(--s-6)">
+        <div class="section-head">
+          <span class="eyebrow">Practical guide</span>
+          <h2 id="image-pdf-guide">Make a PDF that looks right on paper and on screen</h2>
+          <p>Image → PDF is for photos, scans, receipts, screenshots and artwork that should become one document. The controls are deliberately small: order, rotation, page size, fit and quality. Here is how to choose them.</p>
+        </div>
+
+        <div class="grid grid-2" style="margin-bottom: var(--s-4)">
+          <div class="card">
+            <h3 class="card-title">Common jobs and settings</h3>
+            <ul class="text-muted text-sm" style="padding-left:1.1rem; display:grid; gap:.55rem; margin-bottom:0">
+              <li><strong>Phone photos of documents:</strong> choose A4, portrait, fit inside, 10–20 mm margin. The browser applies EXIF orientation first, so pages are not sideways.</li>
+              <li><strong>Receipts or long screenshots:</strong> choose <em>Original image size</em> to avoid trimming detail, then reduce resolution only if the PDF is too large to share.</li>
+              <li><strong>Portfolio or lookbook:</strong> choose US Letter or A4, landscape, and <em>Fill the page</em> only when cropping the edges is acceptable. Fit inside preserves the whole image.</li>
+              <li><strong>Scanned forms:</strong> keep the original resolution and add a modest margin. Every page is an image, so text will not be selectable or searchable.</li>
+            </ul>
+          </div>
+          <div class="card">
+            <h3 class="card-title">Page size, fit and quality</h3>
+            <div class="table-wrap"><table class="text-sm" style="width:100%; border-collapse:collapse">
+              <tbody style="color:var(--text-muted)">
+                <tr><td style="padding:7px 10px 7px 0"><strong>A4</strong></td><td>210 × 297 mm. The usual choice for printing outside North America.</td></tr>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:7px 10px 7px 0"><strong>US Letter</strong></td><td>8.5 × 11 in. The usual choice for printing in the US and Canada.</td></tr>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:7px 10px 7px 0"><strong>Original</strong></td><td>The page follows each image's own dimensions. Useful for screenshots and irregular scans.</td></tr>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:7px 10px 7px 0"><strong>Fit inside</strong></td><td>Shows the entire image with margins; nothing is cropped.</td></tr>
+                <tr style="border-top:1px solid var(--border)"><td style="padding:7px 10px 7px 0"><strong>Fill page</strong></td><td>Fills the page and crops overflow. Good for edge-to-edge photos, wrong for documents with important borders.</td></tr>
+                <tr><td style="padding:7px 10px 7px 0"><strong>Resolution cap</strong></td><td>Downscales the longest side before embedding. 3200 px is a good print-oriented cap; 1200 px is a lighter sharing copy.</td></tr>
+              </tbody>
+            </table></div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-bottom: var(--s-4)">
+          <h3 class="card-title">Frequently asked questions</h3>
+          <div class="grid" style="gap: var(--s-2)">
+            <details><summary style="font-weight:600; cursor:pointer">Will the PDF text be selectable?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">No. Each page is an embedded image, so text inside a photo stays part of the picture. This tool performs no OCR and does not claim to create searchable PDFs.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Are my images uploaded to build the PDF?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">No. Images are decoded by your browser and assembled with pdf-lib inside a local Web Worker. Previews use temporary object URLs that are revoked when you remove an image or leave the page. Nothing is written to a server.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Why did my transparent PNG change colour?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">Transparent areas take on the PDF page background, which is white. If you need a different backdrop, flatten the image onto that colour in an image editor before adding it here.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Can I add more images after generating the PDF?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">Yes. The queue stays in the tab after generation. Add or remove images, change the order, and generate again. Use <em>Start over</em> to clear the queue completely.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">What happens to animated GIFs and SVGs?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">GIFs become a single still frame. SVGs are rendered by the browser at their natural size. Animated AVIF/WebP sources also lose their animation.</p></details>
+            <details><summary style="font-weight:600; cursor:pointer">Can I cancel a large job?</summary><p class="text-muted text-sm" style="margin:.6rem 0 0">Cancel works while images are being read or prepared. Once PDF assembly begins, the worker finishes the document rather than pretending to stop mid-write. For very large batches, use a lower resolution cap or split the job.</p></details>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 class="card-title">Troubleshooting</h3>
+          <div class="table-wrap"><table class="text-sm" style="width:100%; border-collapse:collapse">
+            <thead><tr><th scope="col" style="text-align:left; padding:8px 8px 8px 0">Problem</th><th scope="col" style="text-align:left">What to try</th></tr></thead>
+            <tbody style="color:var(--text-muted)">
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">An image is rejected</td><td>The browser could not decode it. Re-save it as PNG or JPG in an image editor, then add it again.</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">Pages are rotated incorrectly</td><td>Use the rotate control before generating. EXIF orientation is applied automatically, but an image with missing or wrong metadata may still need a manual 90° turn.</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">The PDF is huge</td><td>Set a resolution cap (3200/2200/1200 px) or use JPG-friendly source photos. Every page embeds image data, so resolution is the main size driver.</td></tr>
+              <tr style="border-top:1px solid var(--border)"><td style="padding:8px 8px 8px 0">Edges are cut off</td><td>Switch from <em>Fill the page</em> to <em>Fit inside</em>, or reduce the margin.</td></tr>
+              <tr><td style="padding:8px 8px 8px 0">The tab runs out of memory</td><td>Remove some images, lower the resolution cap, or create two smaller PDFs. A browser tab has finite memory and no swap file of its own.</td></tr>
+            </tbody>
+          </table></div>
+        </div>
+      </section>
     </div>
   </main>
 

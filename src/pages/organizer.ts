@@ -38,7 +38,7 @@ import {
   ReadRecursiveResult,
 } from '../fs/access.js';
 import { executePlan, undoMoves, OpSession, ExecResult, ExecMode, SourceMap, SourceMeta } from '../fs/operations.js';
-import { toast, ICONS } from '../site/layout.js';
+import { toast, ICONS, PAGES } from '../site/layout.js';
 
 // ---------- state ------------------------------------------------------------
 interface Selection {
@@ -79,10 +79,10 @@ function escapeHtml(s: string): string {
   const badge = $('capBadge');
   if (cap.directWrite) {
     badge.className = 'badge badge-ok';
-    badge.innerHTML = `✓ This browser can sort into real folders — <a href="/features.html#compatibility" style="color:inherit; text-decoration:underline">details</a>`;
+    badge.innerHTML = `✓ This browser can sort into real folders — <a href="${PAGES.features.href}#compatibility" style="color:inherit; text-decoration:underline">details</a>`;
   } else {
     badge.className = 'badge badge-warn';
-    badge.innerHTML = `<a href="/features.html#compatibility" style="color:inherit">This browser reads &amp; plans; it delivers the organized result as a ZIP (folder writes aren't supported here)</a>`;
+    badge.innerHTML = `<a href="${PAGES.features.href}#compatibility" style="color:inherit">This browser reads &amp; plans; it delivers the organized result as a ZIP (folder writes aren't supported here)</a>`;
   }
 }
 
