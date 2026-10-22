@@ -106,6 +106,81 @@ const url = (p) => `${BASE}${p}`;
   await ctx.close();
 }
 
+// ---------- 1c. Image → PDF: drag a page to a new position ----------
+{
+  const png = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAWklEQVR4nO3PQQ0AIBDAsAP/nuGNAvZoFSzZOjNnyNi9dwfgUQCeBeBZAF4F4FkAXgXgWQBeBeBZAF4F4FkAXgXgWQBeBeBZAF4F4FkAXgXgWQBeBeBZAF4F4FkAXgXgWQBeBeBZAF4FL1sBAWn4m9kAAAAASUVORK5CYII=',
+    'base64',
+  );
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await ctx.newPage();
+  await page.goto(url('image-to-pdf.html'), { waitUntil: 'networkidle' });
+  await page.locator('#fileInput').setInputFiles([
+    { name: 'first.png', mimeType: 'image/png', buffer: png },
+    { name: 'second.png', mimeType: 'image/png', buffer: png },
+    { name: 'third.png', mimeType: 'image/png', buffer: png },
+  ]);
+  await page.locator('#queue .queue-row').first().waitFor();
+  // Wait until every thumbnail has finished measuring (no "Reading…" left).
+  await page.waitForFunction(
+    () => [...document.querySelectorAll('#queue [data-dims]')].every((el) => !/Reading/.test(el.textContent ?? '')),
+    undefined,
+    { timeout: 15000 },
+  );
+  const capOrder = () =>
+    page.$$eval('#pageStrip .page-cap', (els) => els.map((el) => el.textContent?.replace(/^\d+\.\s*/, '').trim()));
+
+  const before = await capOrder();
+  record('image-to-pdf: page strip follows queue order', before.join('|') === 'first.png|second.png|third.png', before.join('|'));
+
+  // Drag the third row above the first one.
+  const third = page.locator('#queue .queue-row').nth(2);
+  const first = page.locator('#queue .queue-row').nth(0);
+  const thirdBox = (await third.boundingBox());
+  const firstBox = (await first.boundingBox());
+  if (thirdBox && firstBox) {
+    await page.mouse.move(thirdBox.x + thirdBox.width / 2, thirdBox.y + thirdBox.height / 2);
+    await page.mouse.down();
+    await page.mouse.move(thirdBox.x + thirdBox.width / 2, firstBox.y + 4, { steps: 12 });
+    await page.mouse.move(thirdBox.x + thirdBox.width / 2, firstBox.y + 2, { steps: 4 });
+    await page.mouse.up();
+  }
+  await page.waitForTimeout(250);
+  const after = await capOrder();
+  record('image-to-pdf: dragging a row reorders the pages', after.join('|') === 'third.png|first.png|second.png', after.join('|'));
+
+  const rowOrder = await page.$$eval('#queue .queue-row .row-name', (els) => els.map((el) => el.textContent?.trim()));
+  record('image-to-pdf: queue rows and page strip stay in sync', rowOrder.join('|') === after.join('|'), rowOrder.join('|'));
+  await ctx.close();
+}
+
+// ---------- 1d. batch limits are honest (40 images all accepted) ----------
+{
+  const png = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAIAAAAlC+aJAAAAWklEQVR4nO3PQQ0AIBDAsAP/nuGNAvZoFSzZOjNnyNi9dwfgUQCeBeBZAF4F4FkAXgXgWQBeBeBZAF4F4FkAXgXgWQBeBeBZAF4F4FkAXgXgWQBeBeBZAF4F4FkAXgXgWQBeBeBZAF4FL1sBAWn4m9kAAAAASUVORK5CYII=',
+    'base64',
+  );
+  const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+  const page = await ctx.newPage();
+  await page.goto(url('image-to-pdf.html'), { waitUntil: 'networkidle' });
+  const files = Array.from({ length: 40 }, (_, i) => ({
+    name: `batch-${String(i).padStart(3, '0')}.png`,
+    mimeType: 'image/png',
+    buffer: png,
+  }));
+  const started = Date.now();
+  await page.locator('#fileInput').setInputFiles(files);
+  await page.waitForFunction(
+    () =>
+      document.querySelectorAll('#queue .queue-row').length === 40 &&
+      [...document.querySelectorAll('#queue [data-dims]')].every((el) => !/Reading/.test(el.textContent ?? '')),
+    undefined,
+    { timeout: 30000 },
+  );
+  record('image-to-pdf: 40-image batch is accepted and measured quickly', Date.now() - started < 15000, `${Date.now() - started} ms`);
+  await ctx.close();
+}
+
 // ---------- 2+3. home page: hero, demo, categories ----------
 {
   const ctx = await browser.newContext({ viewport: { width: 1366, height: 900 } });

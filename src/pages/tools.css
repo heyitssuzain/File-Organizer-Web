@@ -376,7 +376,8 @@
 .summary-bar strong { color: var(--text); }
 
 /* Reorder ------------------------------------------------------------------ */
-.queue-row.dragging { opacity: 0.45; }
+.queue-row { cursor: grab; content-visibility: auto; contain-intrinsic-size: 66px; }
+.queue-row.dragging { opacity: 0.55; cursor: grabbing; }
 .queue-row.drop-before { box-shadow: inset 0 2px 0 var(--accent); }
 .queue-row.drop-after { box-shadow: inset 0 -2px 0 var(--accent); }
 .drag-handle { cursor: grab; touch-action: none; }
@@ -396,6 +397,8 @@
   overflow: hidden;
   background: var(--bg-sunken);
   min-width: 0;
+  content-visibility: auto;
+  contain-intrinsic-size: 150px;
 }
 .page-card .page-img {
   aspect-ratio: 4 / 3;

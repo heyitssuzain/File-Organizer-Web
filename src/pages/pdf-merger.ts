@@ -9,6 +9,7 @@
 import '../pages/tools.css';
 import { mergePdfsOffMain, readPdfInfoOffMain } from './pdf-worker-client.js';
 import { toast } from '../site/layout.js';
+import { enablePointerReorder } from './queue-reorder.js';
 import {
   $,
   bytesToBlob,
@@ -97,7 +98,7 @@ function addFiles(files: File[]): void {
   const added: PdfItem[] = [];
 
   for (const file of files) {
-    if (items.length + added.length >= MAX_FILES) {
+    if (items.length >= MAX_FILES) {
       skipped.push(`Only ${MAX_FILES} PDFs can be merged at once.`);
       break;
     }
@@ -127,7 +128,18 @@ function addFiles(files: File[]): void {
     toast(`${added.length} PDF${added.length === 1 ? '' : 's'} added.`, 'ok');
   }
   render();
-  for (const item of added) void hydrate(item);
+  void hydrateAll(added);
+}
+
+/** Read PDF metadata with limited concurrency so many large files stay gentle. */
+async function hydrateAll(added: PdfItem[]): Promise<void> {
+  const pending = [...added];
+  const workers = Array.from({ length: Math.min(2, pending.length) }, async () => {
+    for (let item = pending.shift(); item; item = pending.shift()) {
+      await hydrate(item);
+    }
+  });
+  await Promise.all(workers);
 }
 
 async function hydrate(item: PdfItem): Promise<void> {
@@ -143,7 +155,34 @@ async function hydrate(item: PdfItem): Promise<void> {
     item.status = 'error';
     item.error = err instanceof Error ? err.message : String(err);
   }
-  render();
+  updateRow(item);
+  updateSummary();
+}
+
+/** Cheap in-place update for one row after its page count is read. */
+function updateRow(item: PdfItem): void {
+  const row = queue.querySelector<HTMLElement>(`.queue-row[data-id="${item.id}"]`);
+  if (!row) return;
+  row.classList.toggle('is-error', item.status === 'error');
+  const status = row.querySelector<HTMLElement>(`[data-status="${item.id}"]`);
+  if (status) status.outerHTML = statusMarkup(item);
+}
+
+function statusMarkup(item: PdfItem): string {
+  if (item.status === 'loading') return `<span class="tag" data-status="${item.id}">Reading…</span>`;
+  if (item.status === 'error') {
+    return `<span class="tag tag-err" data-status="${item.id}" title="${escapeHtml(item.error ?? 'Unreadable PDF')}">${escapeHtml((item.error ?? 'Unreadable PDF').slice(0, 48))}</span>`;
+  }
+  return `<span class="tag tag-ok" data-status="${item.id}">${item.pageCount} page${item.pageCount === 1 ? '' : 's'}</span>`;
+}
+
+function updateSummary(): void {
+  const ready = items.filter((i) => i.status === 'ready');
+  const pages = ready.reduce((sum, i) => sum + i.pageCount, 0);
+  pageTotal.textContent = `${pages} page${pages === 1 ? '' : 's'}`;
+  summaryBar.innerHTML = `<strong>${ready.length}</strong> readable PDF${ready.length === 1 ? '' : 's'} · <strong>${pages}</strong> total page${pages === 1 ? '' : 's'} · ${formatBytes(totalSize(items.map((i) => i.file)))}`;
+  btnMerge.disabled = working || ready.length === 0;
+  btnMerge.textContent = working ? 'Merging…' : `Merge ${ready.length || ''} PDF${ready.length === 1 ? '' : 's'}`.trim();
 }
 
 function render(): void {
@@ -151,19 +190,9 @@ function render(): void {
   emptyHelp.hidden = items.length > 0;
   dropzone.classList.toggle('compact', items.length > 0);
   queueCount.textContent = String(items.length);
-  const ready = items.filter((i) => i.status === 'ready');
-  const pages = ready.reduce((sum, i) => sum + i.pageCount, 0);
-  const size = totalSize(items.map((i) => i.file));
-  pageTotal.textContent = `${pages} page${pages === 1 ? '' : 's'}`;
-  summaryBar.innerHTML = `<strong>${ready.length}</strong> readable PDF${ready.length === 1 ? '' : 's'} · <strong>${pages}</strong> total page${pages === 1 ? '' : 's'} · ${formatBytes(size)}`;
 
   queue.innerHTML = items.length === 0 ? '<div class="queue-empty">No PDFs yet.</div>' : items.map((item, index) => {
-    const status = item.status === 'loading'
-      ? '<span class="tag">Reading…</span>'
-      : item.status === 'error'
-        ? `<span class="tag tag-err" title="${escapeHtml(item.error ?? 'Unreadable PDF')}">${escapeHtml((item.error ?? 'Unreadable PDF').slice(0, 48))}</span>`
-        : `<span class="tag tag-ok">${item.pageCount} page${item.pageCount === 1 ? '' : 's'}</span>`;
-    return `<div class="queue-row${item.status === 'error' ? ' is-error' : ''}" data-id="${item.id}" data-index="${index}">
+    return `<div class="queue-row${item.status === 'error' ? ' is-error' : ''}" data-id="${item.id}" data-row="${item.id}" data-index="${index}">
       <div class="thumb">${PDF_ICON}</div>
       <div class="row-main">
         <div class="row-name" title="${escapeHtml(item.file.name)}">${escapeHtml(item.file.name)}</div>
@@ -171,11 +200,11 @@ function render(): void {
           <span class="tag">PDF</span>
           <span>${formatBytes(item.file.size)}</span>
           ${item.title ? `<span title="Embedded document title">${escapeHtml(item.title.slice(0, 42))}</span>` : ''}
-          ${status}
+          ${statusMarkup(item)}
         </div>
       </div>
       <div class="row-actions">
-        <button class="icon-btn drag-handle" type="button" draggable="true" data-drag="${item.id}" aria-label="Drag to reorder ${escapeHtml(item.file.name)}" title="Drag to reorder"${working ? ' disabled' : ''}>${DRAG_ICON}</button>
+        <button class="icon-btn drag-handle" type="button" data-drag="${item.id}" aria-label="Drag to reorder ${escapeHtml(item.file.name)}" title="Drag to reorder (or use the arrows)"${working ? ' disabled' : ''}>${DRAG_ICON}</button>
         <button class="icon-btn" type="button" data-up="${item.id}" aria-label="Move ${escapeHtml(item.file.name)} up"${index === 0 || working ? ' disabled' : ''}>${UP_ICON}</button>
         <button class="icon-btn" type="button" data-down="${item.id}" aria-label="Move ${escapeHtml(item.file.name)} down"${index === items.length - 1 || working ? ' disabled' : ''}>${DOWN_ICON}</button>
         <button class="icon-btn danger" type="button" data-remove="${item.id}" aria-label="Remove ${escapeHtml(item.file.name)}"${working ? ' disabled' : ''}>${REMOVE_ICON}</button>
@@ -183,9 +212,8 @@ function render(): void {
     </div>`;
   }).join('');
 
-  btnMerge.disabled = working || ready.length === 0;
-  btnMerge.textContent = working ? 'Merging…' : `Merge ${ready.length || ''} PDF${ready.length === 1 ? '' : 's'}`.trim();
   btnCancel.hidden = !working;
+  updateSummary();
   btnClear.disabled = working || items.length === 0;
   for (const el of document.querySelectorAll<HTMLInputElement>('#settingsGrid input')) el.disabled = working;
 }
@@ -237,48 +265,17 @@ queue.addEventListener('click', (event) => {
   }
 });
 
-let dragId: number | null = null;
-
-queue.addEventListener('dragstart', (event) => {
-  const handle = (event.target as HTMLElement).closest<HTMLElement>('[data-drag]');
-  if (!handle || working) {
-    event.preventDefault();
-    return;
-  }
-  dragId = Number(handle.dataset.drag);
-  handle.closest('.queue-row')?.classList.add('dragging');
-  if (event.dataTransfer) {
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/plain', String(dragId));
-  }
-});
-
-queue.addEventListener('dragover', (event) => {
-  if (dragId === null) return;
-  event.preventDefault();
-  const row = (event.target as HTMLElement).closest<HTMLElement>('.queue-row');
-  for (const el of queue.querySelectorAll('.drop-before, .drop-after')) el.classList.remove('drop-before', 'drop-after');
-  if (!row) return;
-  const rect = row.getBoundingClientRect();
-  row.classList.add(event.clientY > rect.top + rect.height / 2 ? 'drop-after' : 'drop-before');
-});
-
-queue.addEventListener('drop', (event) => {
-  if (dragId === null) return;
-  event.preventDefault();
-  const row = (event.target as HTMLElement).closest<HTMLElement>('.queue-row');
-  const targetId = row?.dataset.id ? Number(row.dataset.id) : null;
-  if (targetId !== null) {
-    const rect = row!.getBoundingClientRect();
-    reorder(dragId, targetId, event.clientY > rect.top + rect.height / 2);
-  }
-  dragId = null;
-  for (const el of queue.querySelectorAll('.drop-before, .drop-after, .dragging')) el.classList.remove('drop-before', 'drop-after', 'dragging');
-});
-
-queue.addEventListener('dragend', () => {
-  dragId = null;
-  for (const el of queue.querySelectorAll('.drop-before, .drop-after, .dragging')) el.classList.remove('drop-before', 'drop-after', 'dragging');
+enablePointerReorder({
+  queue,
+  isBusy: () => working,
+  onCommit: (order) => {
+    const byId = new Map(items.map((item) => [item.id, item]));
+    const next = order.map((id) => byId.get(id)).filter((item): item is PdfItem => Boolean(item));
+    if (next.length !== items.length) return; // never lose a row
+    items = next;
+    render();
+    toast('File order updated.', 'ok');
+  },
 });
 
 $<HTMLButtonElement>('btnClear').addEventListener('click', clearAll);

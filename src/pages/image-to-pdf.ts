@@ -13,6 +13,7 @@ import type { ImagePdfOptions, PdfImageSource } from '../core/pdf-tools.js';
 import { buildImagePdfOffMain } from './pdf-worker-client.js';
 import { imageDimensions, preparePdfImage } from '../browser/image.js';
 import { toast } from '../site/layout.js';
+import { enablePointerReorder } from './queue-reorder.js';
 import {
   $,
   bytesToBlob,
@@ -108,7 +109,7 @@ function addFiles(files: File[]): void {
   const added: ImageItem[] = [];
 
   for (const file of files) {
-    if (items.length + added.length >= MAX_IMAGES) {
+    if (items.length >= MAX_IMAGES) {
       skipped.push(`Only ${MAX_IMAGES} images can be combined in one PDF.`);
       break;
     }
@@ -148,7 +149,18 @@ function addFiles(files: File[]): void {
     toast(`${added.length} image${added.length === 1 ? '' : 's'} added.`, 'ok');
   }
   render();
-  for (const item of added) void hydrate(item);
+  void hydrateAll(added);
+}
+
+/** Read image dimensions a few at a time so 75 files never spike the tab. */
+async function hydrateAll(added: ImageItem[]): Promise<void> {
+  const queueItems = [...added];
+  const workers = Array.from({ length: Math.min(4, queueItems.length) }, async () => {
+    for (let item = queueItems.shift(); item; item = queueItems.shift()) {
+      await hydrate(item);
+    }
+  });
+  await Promise.all(workers);
 }
 
 async function hydrate(item: ImageItem): Promise<void> {
@@ -163,7 +175,45 @@ async function hydrate(item: ImageItem): Promise<void> {
     item.status = 'error';
     item.error = err instanceof Error ? err.message : String(err);
   }
-  render();
+  updateRowMeta(item);
+  updateGenerateState();
+}
+
+/** Cheap in-place update for one row while its dimensions are being read. */
+function updateRowMeta(item: ImageItem): void {
+  const row = queue.querySelector<HTMLElement>(`.queue-row[data-id="${item.id}"]`);
+  if (!row) return;
+  row.classList.toggle('is-error', item.status === 'error');
+  const dims = row.querySelector<HTMLElement>(`[data-dims="${item.id}"]`);
+  if (dims) dims.textContent = dimsLabel(item);
+  const meta = row.querySelector<HTMLElement>('.row-meta');
+  let err = row.querySelector<HTMLElement>('.tag-err');
+  if (item.status === 'error' && meta) {
+    const text = (item.error ?? 'Unreadable image').slice(0, 48);
+    if (!err) {
+      err = document.createElement('span');
+      err.className = 'tag tag-err';
+      meta.appendChild(err);
+    }
+    err.textContent = text;
+    err.title = item.error ?? 'Unreadable image';
+  } else if (err) {
+    err.remove();
+  }
+}
+
+function dimsLabel(item: ImageItem): string {
+  if (item.status === 'ready') return `${item.width} × ${item.height}`;
+  if (item.status === 'loading') return 'Reading…';
+  return 'Unreadable';
+}
+
+/** Updates only the primary buttons, without rebuilding the queue. */
+function updateGenerateState(): void {
+  const ready = items.filter((i) => i.status === 'ready').length;
+  btnGenerate.disabled = working || ready === 0;
+  btnGenerate.textContent = working ? 'Building PDF…' : `Create PDF${ready ? ` · ${ready} page${ready === 1 ? '' : 's'}` : ''}`;
+  btnClear.disabled = working || items.length === 0;
 }
 
 function render(): void {
@@ -171,25 +221,23 @@ function render(): void {
   emptyHelp.hidden = items.length > 0;
   dropzone.classList.toggle('compact', items.length > 0);
   queueCount.textContent = String(items.length);
-  const ready = items.filter((i) => i.status === 'ready').length;
 
   queue.innerHTML = items.length === 0 ? '<div class="queue-empty">No images yet.</div>' : items.map((item, index) => {
     const rotateLabel = item.rotation ? `Rotation ${item.rotation}°` : 'No rotation';
-    const dims = item.status === 'ready' ? `${item.width} × ${item.height}` : item.status === 'loading' ? 'Reading…' : 'Unreadable';
-    return `<div class="queue-row${item.status === 'error' ? ' is-error' : ''}" data-id="${item.id}" data-index="${index}">
-      <div class="thumb"><img src="${item.preview}" alt="" loading="lazy" /></div>
+    return `<div class="queue-row${item.status === 'error' ? ' is-error' : ''}" data-id="${item.id}" data-row="${item.id}" data-index="${index}">
+      <div class="thumb"><img src="${item.preview}" alt="" loading="lazy" decoding="async" /></div>
       <div class="row-main">
         <div class="row-name" title="${escapeHtml(item.file.name)}">${escapeHtml(item.file.name)}</div>
         <div class="row-meta">
           <span class="tag">${escapeHtml(extensionOf(item.file.name) || 'image')}</span>
-          <span>${dims}</span>
+          <span data-dims="${item.id}">${dimsLabel(item)}</span>
           <span>${formatBytes(item.file.size)}</span>
           <span>${rotateLabel}</span>
           ${item.status === 'error' ? `<span class="tag tag-err" title="${escapeHtml(item.error ?? 'Unreadable image')}">${escapeHtml((item.error ?? 'Unreadable image').slice(0, 48))}</span>` : ''}
         </div>
       </div>
       <div class="row-actions">
-        <button class="icon-btn drag-handle" type="button" draggable="true" data-drag="${item.id}" aria-label="Drag to reorder ${escapeHtml(item.file.name)}" title="Drag to reorder"${working ? ' disabled' : ''}>${DRAG_ICON}</button>
+        <button class="icon-btn drag-handle" type="button" data-drag="${item.id}" aria-label="Drag to reorder ${escapeHtml(item.file.name)}" title="Drag to reorder (or use the arrows)"${working ? ' disabled' : ''}>${DRAG_ICON}</button>
         <button class="icon-btn" type="button" data-up="${item.id}" aria-label="Move ${escapeHtml(item.file.name)} up"${index === 0 || working ? ' disabled' : ''}>${UP_ICON}</button>
         <button class="icon-btn" type="button" data-down="${item.id}" aria-label="Move ${escapeHtml(item.file.name)} down"${index === items.length - 1 || working ? ' disabled' : ''}>${DOWN_ICON}</button>
         <button class="icon-btn" type="button" data-rotate="${item.id}" aria-label="Rotate ${escapeHtml(item.file.name)} 90 degrees"${working ? ' disabled' : ''}>${ROTATE_ICON}</button>
@@ -199,14 +247,12 @@ function render(): void {
   }).join('');
 
   pageStrip.innerHTML = items.map((item, index) => `<div class="page-card">
-    <div class="page-img"><img src="${item.preview}" alt="${escapeHtml(item.file.name)} preview" loading="lazy" style="transform:rotate(${item.rotation}deg)" /></div>
+    <div class="page-img"><img src="${item.preview}" alt="${escapeHtml(item.file.name)} preview" loading="lazy" decoding="async" style="transform:rotate(${item.rotation}deg)" /></div>
     <div class="page-cap">${index + 1}. ${escapeHtml(item.file.name)}${item.rotation ? ` · ${item.rotation}°` : ''}</div>
   </div>`).join('');
 
-  btnGenerate.disabled = working || ready === 0;
-  btnGenerate.textContent = working ? 'Building PDF…' : `Create PDF${ready ? ` · ${ready} page${ready === 1 ? '' : 's'}` : ''}`;
   btnCancel.hidden = !working;
-  btnClear.disabled = working || items.length === 0;
+  updateGenerateState();
   for (const el of document.querySelectorAll<HTMLInputElement | HTMLSelectElement>('#settingsGrid select, #settingsGrid input')) {
     el.disabled = working;
   }
@@ -277,50 +323,17 @@ queue.addEventListener('click', (event) => {
   }
 });
 
-let dragId: number | null = null;
-
-queue.addEventListener('dragstart', (event) => {
-  const handle = (event.target as HTMLElement).closest<HTMLElement>('[data-drag]');
-  if (!handle || working) {
-    event.preventDefault();
-    return;
-  }
-  dragId = Number(handle.dataset.drag);
-  const row = handle.closest('.queue-row');
-  row?.classList.add('dragging');
-  if (event.dataTransfer) {
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/plain', String(dragId));
-  }
-});
-
-queue.addEventListener('dragover', (event) => {
-  if (dragId === null) return;
-  event.preventDefault();
-  const row = (event.target as HTMLElement).closest<HTMLElement>('.queue-row');
-  for (const el of queue.querySelectorAll('.drop-before, .drop-after')) el.classList.remove('drop-before', 'drop-after');
-  if (!row) return;
-  const rect = row.getBoundingClientRect();
-  const after = event.clientY > rect.top + rect.height / 2;
-  row.classList.add(after ? 'drop-after' : 'drop-before');
-});
-
-queue.addEventListener('drop', (event) => {
-  if (dragId === null) return;
-  event.preventDefault();
-  const row = (event.target as HTMLElement).closest<HTMLElement>('.queue-row');
-  const targetId = row?.dataset.id ? Number(row.dataset.id) : null;
-  if (targetId !== null) {
-    const rect = row!.getBoundingClientRect();
-    reorder(dragId, targetId, event.clientY > rect.top + rect.height / 2);
-  }
-  dragId = null;
-  for (const el of queue.querySelectorAll('.drop-before, .drop-after, .dragging')) el.classList.remove('drop-before', 'drop-after', 'dragging');
-});
-
-queue.addEventListener('dragend', () => {
-  dragId = null;
-  for (const el of queue.querySelectorAll('.drop-before, .drop-after, .dragging')) el.classList.remove('drop-before', 'drop-after', 'dragging');
+enablePointerReorder({
+  queue,
+  isBusy: () => working,
+  onCommit: (order) => {
+    const byId = new Map(items.map((item) => [item.id, item]));
+    const next = order.map((id) => byId.get(id)).filter((item): item is ImageItem => Boolean(item));
+    if (next.length !== items.length) return; // never lose a row
+    items = next;
+    render();
+    toast('Page order updated.', 'ok');
+  },
 });
 
 $<HTMLButtonElement>('btnClear').addEventListener('click', clearAll);

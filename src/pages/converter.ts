@@ -217,7 +217,7 @@ function render(): void {
       const err = item.status === 'error' && item.error
         ? `<span class="tag tag-err" title="${escapeHtml(item.error)}">${escapeHtml(item.error.slice(0, 60))}${item.error.length > 60 ? '…' : ''}</span>`
         : '';
-      return `<div class="queue-row${item.status === 'working' ? ' is-busy' : ''}${item.status === 'error' ? ' is-error' : ''}${item.status === 'done' ? ' is-done' : ''}" data-id="${item.id}">
+      return `<div class="queue-row${item.status === 'working' ? ' is-busy' : ''}${item.status === 'error' ? ' is-error' : ''}${item.status === 'done' ? ' is-done' : ''}" data-id="${item.id}" data-row="${item.id}">
         <div class="thumb">${thumb}</div>
         <div class="row-main">
           <div class="row-name" title="${escapeHtml(item.file.name)}">${escapeHtml(item.file.name)}</div>
@@ -225,7 +225,7 @@ function render(): void {
             <span class="tag">${escapeHtml(item.sourceExt || item.kind)}</span>
             <span>${formatBytes(item.file.size)}</span>
             <span>→ ${escapeHtml(item.output.toUpperCase())}</span>
-            <span class="${item.status === 'done' ? 'tag tag-ok' : ''}">${statusLabel(item)}</span>
+            <span data-status="${item.id}" class="${item.status === 'done' ? 'tag tag-ok' : ''}">${statusLabel(item)}</span>
             ${err}
           </div>
         </div>
@@ -243,6 +243,34 @@ function render(): void {
   btnClear.disabled = converting || items.length === 0;
   for (const el of document.querySelectorAll<HTMLInputElement | HTMLSelectElement>('#settingsGrid select, #settingsGrid input')) {
     el.disabled = converting;
+  }
+}
+
+/** Updates a single row's state without rebuilding the whole queue. */
+function updateRow(item: Item): void {
+  const row = queue.querySelector<HTMLElement>(`.queue-row[data-id="${item.id}"]`);
+  if (!row) return;
+  row.classList.toggle('is-busy', item.status === 'working');
+  row.classList.toggle('is-error', item.status === 'error');
+  row.classList.toggle('is-done', item.status === 'done');
+  const status = row.querySelector<HTMLElement>(`[data-status="${item.id}"]`);
+  if (status) {
+    status.textContent = statusLabel(item);
+    status.className = item.status === 'done' ? 'tag tag-ok' : '';
+  }
+  const meta = row.querySelector<HTMLElement>('.row-meta');
+  let err = row.querySelector<HTMLElement>('.tag-err');
+  if (item.status === 'error' && item.error && meta) {
+    const text = item.error.length > 60 ? `${item.error.slice(0, 60)}…` : item.error;
+    if (!err) {
+      err = document.createElement('span');
+      err.className = 'tag tag-err';
+      meta.appendChild(err);
+    }
+    err.textContent = text;
+    err.title = item.error;
+  } else if (err) {
+    err.remove();
   }
 }
 
@@ -403,7 +431,7 @@ async function convertAll(): Promise<void> {
     if (cancelled) break;
     const item = items[i]!;
     item.status = 'working';
-    render();
+    updateRow(item);
     setProgress(progressPanel, progressBar, progressLabel, progressDetail, i, items.length, `Converting ${item.file.name}…`);
     try {
       const result = await outputBlobFor(item);
@@ -417,6 +445,7 @@ async function convertAll(): Promise<void> {
       item.error = err instanceof Error ? err.message : String(err);
       failed++;
     }
+    updateRow(item);
     setProgress(progressPanel, progressBar, progressLabel, progressDetail, i + 1, items.length, item.status === 'done' ? `Finished ${item.file.name}` : `Could not convert ${item.file.name}`);
     await new Promise((resolve) => setTimeout(resolve, 0));
   }

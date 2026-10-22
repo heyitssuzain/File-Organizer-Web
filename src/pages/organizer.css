@@ -109,6 +109,8 @@
   padding: 9px var(--s-4);
   border-bottom: 1px solid var(--border);
   font-size: var(--fs-sm);
+  content-visibility: auto;
+  contain-intrinsic-size: 40px;
 }
 .file-row:last-child { border-bottom: 0; }
 .file-dot {
@@ -173,6 +175,8 @@
   border: 1px solid var(--border);
   border-radius: var(--r-sm);
   padding: 7px var(--s-3);
+  content-visibility: auto;
+  contain-intrinsic-size: 38px;
 }
 .plan-row .arrow { color: var(--text-faint); text-align: center; }
 .plan-row .src { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
