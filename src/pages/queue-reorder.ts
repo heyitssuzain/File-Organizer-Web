@@ -4,9 +4,10 @@
  * Desktop: drag a row from anywhere on it.
  * Touch: drag from the handle only, so the list can still be scrolled normally.
  *
- * Rows are moved in the DOM while dragging (one layout pass per pointer move)
- * and the final order is committed once on release, instead of rebuilding the
- * whole queue on every event.
+ * Targeting is computed against a layout snapshot taken when the drag starts,
+ * so the row list cannot oscillate while the dragged row moves under the
+ * pointer. Rows are moved in the DOM during the drag and the final order is
+ * committed once on release.
  */
 
 export interface PointerReorderOptions {
@@ -22,18 +23,66 @@ export interface PointerReorderOptions {
   handleSelector?: string;
 }
 
+interface SnapshotBand {
+  el: HTMLElement;
+  /** Page-space (scroll-inclusive) vertical band of the row at drag start. */
+  top: number;
+  bottom: number;
+}
+
+interface DragState {
+  el: HTMLElement;
+  startY: number;
+  pointerId: number;
+  active: boolean;
+  snapshot: SnapshotBand[];
+}
+
 export function enablePointerReorder(options: PointerReorderOptions): void {
   const { queue } = options;
   const rowSelector = options.rowSelector ?? '.queue-row';
   const handleSelector = options.handleSelector ?? '[data-drag]';
+  const rowQuery = `${rowSelector}[data-id]`;
 
-  let drag: { el: HTMLElement; startY: number; pointerId: number; active: boolean } | null = null;
+  let drag: DragState | null = null;
 
-  const rowFromPoint = (x: number, y: number): HTMLElement | null => {
-    const hit = document.elementFromPoint(x, y) as HTMLElement | null;
-    const row = hit?.closest<HTMLElement>(rowSelector) ?? null;
-    if (!row || row === drag?.el) return null;
-    return row;
+  const orderedRows = (): HTMLElement[] => [...queue.querySelectorAll<HTMLElement>(rowQuery)];
+
+  /** Page-space band snapshot of every row except the dragged one. */
+  const snapshotAround = (dragged: HTMLElement): SnapshotBand[] => {
+    const scrollY = window.scrollY;
+    return orderedRows()
+      .filter((el) => el !== dragged)
+      .map((el) => {
+        const rect = el.getBoundingClientRect();
+        return { el, top: rect.top + scrollY, bottom: rect.bottom + scrollY };
+      });
+  };
+
+  /**
+   * Where the dragged row should go for a pointer position, using the frozen
+   * snapshot bands (so a moved row cannot flip-flop the target).
+   */
+  const targetFor = (pageY: number): { row: HTMLElement; after: boolean } | null => {
+    const bands = drag?.snapshot ?? [];
+    if (bands.length === 0) return null;
+    for (const band of bands) {
+      if (pageY >= band.top && pageY < band.bottom) {
+        const mid = (band.top + band.bottom) / 2;
+        return { row: band.el, after: pageY >= mid };
+      }
+    }
+    const first = bands[0]!;
+    const last = bands[bands.length - 1]!;
+    if (pageY < first.top) return { row: first.el, after: false };
+    if (pageY >= last.bottom) return { row: last.el, after: true };
+    // In a gap between two bands: attach to the nearer upper row.
+    for (let i = 0; i < bands.length - 1; i++) {
+      if (pageY >= bands[i]!.bottom && pageY < bands[i + 1]!.top) {
+        return { row: bands[i + 1]!.el, after: false };
+      }
+    }
+    return null;
   };
 
   const onPointerDown = (event: PointerEvent): void => {
@@ -46,29 +95,49 @@ export function enablePointerReorder(options: PointerReorderOptions): void {
     if (event.pointerType === 'touch' && !fromHandle) return;
     // Buttons, selects and links keep their own behaviour.
     if (!fromHandle && target.closest('button, select, input, a')) return;
-    drag = { el: row, startY: event.clientY, pointerId: event.pointerId, active: false };
+    drag = {
+      el: row,
+      startY: event.clientY,
+      pointerId: event.pointerId,
+      active: false,
+      snapshot: [],
+    };
   };
 
   const onPointerMove = (event: PointerEvent): void => {
     if (!drag || event.pointerId !== drag.pointerId) return;
-    if (!drag.active) {
-      if (Math.abs(event.clientY - drag.startY) < 6) return;
-      drag.active = true;
-      drag.el.classList.add('dragging');
+    const state = drag;
+    const pageY = event.clientY + window.scrollY;
+
+    if (!state.active) {
+      if (Math.abs(event.clientY - state.startY) < 6) return;
+      state.active = true;
+      state.snapshot = snapshotAround(state.el);
+      state.el.classList.add('dragging');
       document.body.style.cursor = 'grabbing';
     }
     event.preventDefault();
 
     // Keep the dragged row reachable when the queue is taller than the screen.
     const margin = 56;
-    if (event.clientY < margin) window.scrollBy(0, -14);
-    else if (event.clientY > window.innerHeight - margin) window.scrollBy(0, 14);
+    if (event.clientY < margin) window.scrollBy(0, -22);
+    else if (event.clientY > window.innerHeight - margin) window.scrollBy(0, 22);
 
-    const over = rowFromPoint(event.clientX, event.clientY);
-    if (!over) return;
-    const rect = over.getBoundingClientRect();
-    const after = event.clientY > rect.top + rect.height / 2;
-    over.parentElement?.insertBefore(drag.el, after ? over.nextSibling : over);
+    const target = targetFor(pageY);
+    if (!target) return;
+
+    // Apply the move only when it actually changes the row's DOM position, so
+    // repeated pointer moves inside one band never fight each other.
+    const rows = orderedRows();
+    const from = rows.indexOf(state.el);
+    let to = rows.indexOf(target.row);
+    if (from < 0 || to < 0) return;
+    if (target.after) to += 1;
+    if (from === to) return;
+    if (from < to) to -= 1;
+    const parent = target.row.parentElement;
+    const reference = rows[to] ?? null;
+    if (parent && reference !== state.el) parent.insertBefore(state.el, reference);
   };
 
   const finish = (event: PointerEvent): void => {
@@ -78,10 +147,7 @@ export function enablePointerReorder(options: PointerReorderOptions): void {
     document.body.style.cursor = '';
     if (!current.active) return;
     current.el.classList.remove('dragging');
-    const order = [...queue.querySelectorAll<HTMLElement>(`${rowSelector}[data-id]`)].map((el) =>
-      Number(el.dataset.id),
-    );
-    options.onCommit(order);
+    options.onCommit(orderedRows().map((el) => Number(el.dataset.id)));
   };
 
   queue.addEventListener('pointerdown', onPointerDown);
