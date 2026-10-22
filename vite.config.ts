@@ -30,6 +30,12 @@ const CANONICAL =
   readEnv('CANONICAL_BASE_URL') ||
   'https://online-file-organizer.vercel.app/';
 const CANONICAL_BASE = CANONICAL.endsWith('/') ? CANONICAL : `${CANONICAL}/`;
+/**
+ * Stable IndexNow key (lives at /<key>.txt in the build). It must never change:
+ * URLs that engines validated once keep pointing at this key file. Used by
+ * `npm run indexnow` after a deploy; see DEPLOY.md.
+ */
+const INDEXNOW_KEY = '1f0e3749b2a8cd65';
 
 /** Replaces __BASE_URL__ at serve/build time without mutating source files. */
 function seoBaseUrl() {
@@ -87,7 +93,8 @@ ${pages
         resolve(outDir, 'robots.txt'),
         `User-agent: *\nAllow: /\n\nSitemap: ${base}sitemap.xml\n`,
       );
-      console.log(`seo-files: sitemap.xml + robots.txt written (base=${base})`);
+      writeFileSync(resolve(outDir, `${INDEXNOW_KEY}.txt`), INDEXNOW_KEY);
+      console.log(`seo-files: sitemap.xml + robots.txt + ${INDEXNOW_KEY}.txt written (base=${base})`);
     },
   };
 }

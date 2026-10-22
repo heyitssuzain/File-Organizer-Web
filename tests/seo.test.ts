@@ -201,6 +201,17 @@ describe('sitemap and robots configuration', () => {
     expect(txt).toMatch(/^Allow: \/$/m);
     expect(txt).toContain('Sitemap: https://online-file-organizer.vercel.app/sitemap.xml');
   });
+
+  it('the IndexNow key is stable and shared by the ping script and smoke check', () => {
+    // The key must never change across builds: engine-validated URLs keep
+    // pointing at /<key>.txt, and a mismatch breaks prior submissions.
+    const keys = [read('vite.config.ts'), read('scripts/indexnow.mjs'), read('scripts/smoke.mjs')].map(
+      (text) => text.match(/1f0e3749b2a8cd65/g)?.length ?? 0,
+    );
+    expect(keys[0]).toBeGreaterThan(0);
+    expect(keys[1]).toBeGreaterThan(0);
+    expect(keys[2]).toBeGreaterThan(0);
+  });
 });
 
 describe('deployment headers', () => {

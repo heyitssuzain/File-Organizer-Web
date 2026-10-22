@@ -79,6 +79,23 @@ node scripts/tools-test.mjs   # needs the built site + a browser for some checks
 node scripts/smoke.mjs
 ```
 
+## Search-engine ping after deploying
+
+```powershell
+npm run indexnow
+```
+
+- Pings all sitemap URLs to the IndexNow API (works for **Bing, DuckDuckGo,
+  Yahoo, Yandex, Naver, Seznam**). The command first verifies
+  `https://online-file-organizer.vercel.app/1f0e3749b2a8cd65.txt` is live, so
+  run it **after** a successful production deploy. Expect Remote/HTTP 200/202.
+- **Google deliberately ignores IndexNow.** Google re-reads `/sitemap.xml` on
+  its own schedule (roughly weekly, visible under Sitemaps → Last read). To
+  speed Google up, resubmit `/sitemap.xml` in Search Console and use URL
+  Inspection → REQUEST INDEXING on the pages you care about most. Any claims
+  about indexing are only verifiable in the Search Console Pages report after
+  it finishes processing (it can show “Processing data” for about a day).
+
 ## Known, documented limitations (non-blocking)
 
 - `vite preview` locally serves `index.html` for unknown routes with HTTP 200 —

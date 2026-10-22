@@ -459,6 +459,15 @@ const url = (p) => `${BASE}${p}`;
   record('sitemap.xml lists all public pages', sitemapUrls >= 17, `${sitemapUrls} urls`);
   const robots = await (await ctx.request.get(`${BASE}robots.txt`)).text();
   record('robots.txt references sitemap', /Sitemap:/i.test(robots));
+
+  const KEY = '1f0e3749b2a8cd65';
+  const keyRes = await ctx.request.get(`${BASE}${KEY}.txt`);
+  const keyText = keyRes.status() === 200 ? await keyRes.text() : '';
+  record(
+    'IndexNow key file live with exact-key content',
+    keyRes.status() === 200 && keyText.trim() === KEY,
+    `HTTP ${keyRes.status()}`,
+  );
   await ctx.close();
 }
 

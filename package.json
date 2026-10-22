@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "test:tools": "node scripts/tools-test.mjs",
     "test:smoke": "node scripts/smoke.mjs",
+    "indexnow": "node scripts/indexnow.mjs",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
