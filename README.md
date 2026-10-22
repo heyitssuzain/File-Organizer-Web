@@ -53,7 +53,7 @@ Important details:
 ### Image → PDF
 
 - Input: PNG, JPG/JPEG, WebP, BMP, GIF (first frame), SVG, AVIF and other browser-decodable images.
-- One image per page, in the visible queue order (drag the handle or use the up/down buttons).
+- One image per page, in the visible queue order (drag a row on desktop, drag the handle on touch, or use the up/down buttons).
 - Rotate in 90° steps. Page size A4, US Letter or the original image size. Auto/portrait/landscape
   orientation. Fit-inside or fill-page (crop) placement. 0/10/20/30 mm margins. Optional downscaling
   to 3200/2200/1200 px.
